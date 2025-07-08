@@ -1,0 +1,63 @@
+CREATE SCHEMA IF NOT EXISTS BookShopdb;
+USE BookShopdb;
+
+CREATE TABLE IF NOT EXISTS User(
+idUser INT PRIMARY KEY AUTO_INCREMENT,
+username VARCHAR(45) NOT NULL UNIQUE,
+password VARCHAR(45) NOT NULL,
+email VARCHAR(100) NOT NULL UNIQUE,
+phoneNumber VARCHAR(15) NOT NULL UNIQUE,
+adress VARCHAR(45) NOT NULL
+);
+CREATE TABLE  IF NOT EXISTS Account(
+idAccount INT PRIMARY KEY AUTO_INCREMENT,
+user_id INT NOT NULL,
+currency VARCHAR(10) NOT NULL DEFAULT 'BG',
+balance DECIMAL(10,2) DEFAULT 0,
+FOREIGN KEY (user_id)  REFERENCES USER(idUser)
+);
+CREATE TABLE IF NOT EXISTS OnSale(
+idOnSale INT PRIMARY KEY AUTO_INCREMENT,
+code VARCHAR(45) NOT NULL UNIQUE,
+code_name VARCHAR(100),
+discount_persantage DECIMAL (5,2) NOT NULL,
+valid_from DATETIME NOT NULL,
+valid_until DATETIME NOT NULL
+);
+CREATE TABLE IF NOT EXISTS Books(
+idBooks INT PRIMARY KEY AUTO_INCREMENT,
+onSale_id INT NULL,
+title VARCHAR(45) NOT NULL,
+author VARCHAR(45) NOT NULL,
+category VARCHAR(45),
+price DECIMAL(10,2) NOT NULL,
+quantity INT UNSIGNED NOT NULL,
+FOREIGN KEY (onSale_id) REFERENCES OnSale(idOnSale)
+);
+CREATE TABLE IF NOT EXISTS Orders(
+idOrder INT PRIMARY KEY AUTO_INCREMENT,
+user_id INT NOT NULL,
+date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+status ENUM('PROCESSING', 'SHIPPED', 'COMPLETED', 'CANCEL') NOT NULL,
+total_Price DECIMAL (10,2) DEFAULT 0,
+FOREIGN KEY(user_id) REFERENCES User(idUser)
+);
+CREATE TABLE IF NOT EXISTS OrderItems(
+idOrderItem INT PRIMARY KEY AUTO_INCREMENT,
+order_id INT NOT NULL,
+book_id INT NOT NULL,
+quantity INT NOT NULL,
+FOREIGN KEY(order_id) REFERENCES Orders(idOrder),
+FOREIGN KEY(book_id) REFERENCES Books(idBooks)
+);
+CREATE TABLE IF NOT EXISTS User_has_OnSale(
+user_id INT NOT NULL,
+onSale_id INT NOT NULL,
+used_at DATETIME DEFAULT NULL,
+PRIMARY KEY(user_id,onSale_id),
+FOREIGN KEY(user_id) REFERENCES User(idUser),
+FOREIGN KEY(onSale_id) REFERENCES OnSale(idOnSale)
+);
+Insert into  Books(onsale,title,author,cathegory,price, quantity)
+Values(1, 'The Lock Eater', 'Zack Loran Clark', 'детски', 28, 1000),
+(Null,'Книга на праха', 'Филип Пулман', 'научна фантастика', 24.99, 1000);
